@@ -45,7 +45,10 @@ COPY --from=builder-base /s6-install /
 COPY --from=builder-base $VENV_PATH $VENV_PATH
 COPY --from=builder-base /app/staticfiles /app/staticfiles
 COPY deploy/etc  /etc
-COPY . /app
+COPY {{ cookiecutter.project_name }} /app/{{ cookiecutter.project_name }}
+COPY manage.py /app
+RUN rm -r /app/{{ cookiecutter.project_name }}/static/
+
 
 EXPOSE 80
 ENTRYPOINT ["/init"]
