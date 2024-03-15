@@ -6,8 +6,8 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     PYSETUP_PATH="/opt/pysetup" \
-    TAILWIND_CLI_PATH="/opt/tailwind" \
     VENV_PATH="/opt/pysetup/.venv" \
+    TAILWIND_CLI_PATH="/opt/tailwind" \
     S6_KILL_GRACETIME=0 \
     S6_OVERLAY_VERSION=3.1.6.2 \
     S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
@@ -20,8 +20,8 @@ FROM python-base as builder-base
 # Install dependencies
 WORKDIR $PYSETUP_PATH
 COPY ./requirements.txt ./
-RUN pip install --upgrade pip uv
-RUN python -m uv venv $VENV_PATH && uv pip install -r requirements.txt
+RUN pip install --upgrade pip uv \
+ && python -m uv venv $VENV_PATH && uv pip install -r requirements.txt
 
 # Install s6-overlay
 RUN apt-get update && apt-get install -y xz-utils --no-install-recommends
@@ -36,7 +36,7 @@ ENV DEBUG=True
 COPY . /app
 WORKDIR /app
 RUN python manage.py tailwind --skip-checks build \
- && python manage.py collectstatic --no-input --skip-checks --clear
+ && python manage.py collectstatic --no-input --skip-checks --clear \
 
 # Stage 3: Run service
 FROM python-base as production
