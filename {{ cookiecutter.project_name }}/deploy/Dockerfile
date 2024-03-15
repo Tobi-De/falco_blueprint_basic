@@ -36,7 +36,7 @@ ENV DEBUG=True
 COPY . /app
 WORKDIR /app
 RUN python manage.py tailwind --skip-checks build \
- && python manage.py collectstatic --no-input --skip-checks --clear \
+ && python manage.py collectstatic --no-input --skip-checks --clear 
 
 # Stage 3: Run service
 FROM python-base as production
