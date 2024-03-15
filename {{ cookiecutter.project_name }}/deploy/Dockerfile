@@ -48,6 +48,7 @@ COPY --from=builder-base /app/{{ cookiecutter.project_name }}/staticfiles /app/{
 COPY deploy/etc/s6-overlay  /etc/s6-overlay
 COPY {{ cookiecutter.project_name }} /app/{{ cookiecutter.project_name }}
 COPY manage.py /app/manage.py
+RUN rm -r /app/{{ cookiecutter.project_name }}/static/
 
 EXPOSE 80
 ENTRYPOINT ["/init"]
