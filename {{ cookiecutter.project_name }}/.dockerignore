@@ -1,5 +1,6 @@
 .devcontainer/
 .git/
+.idea/
 .github/
 .vscode/
 __pycache__/
