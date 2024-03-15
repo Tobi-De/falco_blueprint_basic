@@ -35,7 +35,7 @@ RUN tar -C /s6-install -Jxpf /tmp/s6-overlay-noarch.tar.xz \
 ENV DEBUG=True
 COPY . /app
 WORKDIR /app
-RUN python manage.py tailwind build \
+RUN python manage.py tailwind --skip-checks build \
  && python manage.py collectstatic --no-input --skip-checks --clear
 
 # Stage 3: Run service
