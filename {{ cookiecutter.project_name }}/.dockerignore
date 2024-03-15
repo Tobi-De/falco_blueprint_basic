@@ -1,0 +1,17 @@
+.devcontainer/
+.git/
+.github/
+.vscode/
+__pycache__/
+docs/
+tests/
+deploy/
+requirements/
+*.sqlite3
+.editorconfig
+.env*
+.pre-commit-config.yaml
+LICENSE
+README.md
+playground.ipynb
+pyproject.toml
