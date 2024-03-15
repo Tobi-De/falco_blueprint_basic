@@ -5,7 +5,6 @@
 __pycache__/
 docs/
 tests/
-deploy/
 requirements/
 *.sqlite3
 .editorconfig
