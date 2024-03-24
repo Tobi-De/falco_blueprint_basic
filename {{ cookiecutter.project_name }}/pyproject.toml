@@ -20,10 +20,7 @@ dependencies = [
   "django[argon2]",
   "django-allauth",
   "django-anymail[amazon-ses]",
-  "django-browser-reload",
-  "django-debug-toolbar",
   "django-extensions",
-  "django-fastdev",
   "django-htmx",
   "django-model-utils",
   "django-tailwind-cli",
@@ -98,15 +95,24 @@ type = "pip-compile"
 pip-compile-constraint = "default"
 pip-compile-installer = "uv"
 pip-compile-resolver = "uv"
-dependencies = ["dj-notebook>=0.6.1", "Werkzeug[watchdog]>=3.0.1", "pre-commit", "django-stubs[compatible-mypy]", "falco-cli"]
+lock-filename = "requirements.txt"
 
-[tool.hatch.envs.default.scripts]
-runserver = ["migrate", "python manage.py tailwind runserver {args}"]
-migrate = "python manage.py migrate {args}"
-makemigrations = "python manage.py makemigrations {args}"
-reset-db = "python manage.py reset_db --noinput"
-shell = "python manage.py shell_plus {args}"
-upgrade-deps = ["rm requirements.txt", "hatch env run --env default -- python --version"]
+[tool.hatch.envs.dev]
+dependencies = [
+    "django-browser-reload",
+    "django-debug-toolbar",
+    "dj-notebook>=0.6.1",
+    "Werkzeug[watchdog]>=3.0.1",
+    "django-stubs[compatible-mypy]",
+    "coverage[toml]>=6.5",
+    "pre-commit",
+    "pytest",
+    "pytest-django",
+    "pytest-sugar",
+    "pytest-xdist",
+    "falco-cli"
+]
+lock-filename = "requirements-dev.txt"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -118,25 +124,6 @@ dependencies = [
     "myst-parser",
 ]
 lock-filename = "docs/requirements.txt"
-
-[tool.hatch.envs.docs.scripts]
-serve = "sphinx-autobuild docs docs/_build/html --port 8001"
-
-[tool.hatch.envs.test]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-  "pytest-django",
-  "pytest-sugar",
-  "pytest-xdist",
-]
-lock-filename = "tests/requirements.txt"
-
-[tool.hatch.envs.test.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = ["- coverage combine", "coverage report"]
-cov = ["test-cov", "cov-report"]
 
 [tool.mypy]
 python_version = "3.11"

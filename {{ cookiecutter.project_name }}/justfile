@@ -1,0 +1,19 @@
+
+
+#[tool.hatch.envs.default.scripts]
+#runserver = ["migrate", "python manage.py tailwind runserver {args}"]
+#migrate = "python manage.py migrate {args}"
+#makemigrations = "python manage.py makemigrations {args}"
+#reset-db = "python manage.py reset_db --noinput"
+#shell = "python manage.py shell_plus {args}"
+#upgrade-deps = ["rm requirements.txt", "hatch env run --env default -- python --version"]
+
+#[tool.hatch.envs.test.scripts]
+#test = "pytest {args:tests}"
+#test-cov = "coverage run -m pytest {args:tests}"
+#cov-report = ["- coverage combine", "coverage report"]
+#cov = ["test-cov", "cov-report"]
+
+
+#[tool.hatch.envs.docs.scripts]
+#serve = "sphinx-autobuild docs docs/_build/html --port 8001"
