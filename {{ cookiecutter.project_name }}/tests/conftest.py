@@ -30,7 +30,7 @@ TEST_SETTINGS = {
             "BACKEND": "django.core.files.storage.InMemoryStorage",
         },
         "staticfiles": {
-            "BACKEND": "django.core.files.storage.InMemoryStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     },
     "WHITENOISE_AUTOREFRESH": True,
