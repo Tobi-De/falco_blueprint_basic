@@ -5,6 +5,7 @@
 !manage.py
 !requirements*.txt
 !tailwind.config.js
+!package*.json
 
 **/*~
 **/*.log
