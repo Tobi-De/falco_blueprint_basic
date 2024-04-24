@@ -48,6 +48,7 @@ dependencies = [
 django_settings_module = "{{ cookiecutter.project_name }}.settings"
 
 [tool.djlint]
+custom_blocks = "partialdef"
 blank_line_after_tag = "load,extends"
 close_void_tags = true
 format_css = true
