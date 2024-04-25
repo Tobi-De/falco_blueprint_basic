@@ -50,5 +50,5 @@ COPY manage.py /app
 RUN rm -r /app/{{ cookiecutter.project_name }}/static/
 
 
-EXPOSE 80
+EXPOSE 8000
 ENTRYPOINT ["/init"]
