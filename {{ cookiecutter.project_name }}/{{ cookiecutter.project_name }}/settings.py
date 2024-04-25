@@ -362,9 +362,9 @@ Q_CLUSTER = {
 
 
 # sentry
-if not DEBUG or env.bool("ENABLE_SENTRY", default=False):
+if (SENTRY_DSN := env.url("SENTRY_DSN", default=None)).scheme and not DEBUG:
     sentry_sdk.init(
-        dsn=env.url("SENTRY_DSN", default=None),
+        dsn=SENTRY_DSN.geturl(),
         environment=env.str("SENTRY_ENV", default="development", validate=OneOf(["development", "production"])),
         integrations=[
             DjangoIntegration(),
