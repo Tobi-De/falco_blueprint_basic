@@ -2,4 +2,4 @@
 
 cd /app
 foreground { python manage.py createsuperuser --noinput }
-gunicorn {{ cookiecutter.project_name }}.wsgi:application --config="deploy/gunicorn.conf.py"
+gunicorn {{ cookiecutter.project_name }}.wsgi:application --config="/etc/gunicorn.conf.py"
