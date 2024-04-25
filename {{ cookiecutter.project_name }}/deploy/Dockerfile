@@ -52,3 +52,4 @@ RUN rm -r /app/{{ cookiecutter.project_name }}/static/
 
 EXPOSE 8000
 ENTRYPOINT ["/init"]
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl -f http://localhost:8000/health
