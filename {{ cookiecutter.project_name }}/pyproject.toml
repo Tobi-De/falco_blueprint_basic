@@ -100,7 +100,14 @@ type = "pip-compile"
 pip-compile-constraint = "default"
 pip-compile-installer = "uv"
 pip-compile-resolver = "uv"
-dependencies = ["dj-notebook>=0.6.1", "Werkzeug[watchdog]>=3.0.1", "pre-commit", "django-stubs[compatible-mypy]", "falco-cli"]
+dependencies = [
+  "dj-notebook>=0.6.1",
+  "Werkzeug[watchdog]>=3.0.1",
+  "pre-commit",
+  "django-stubs[compatible-mypy]",
+  "falco-cli",
+  "pywatchman",
+]
 
 [tool.hatch.envs.default.scripts]
 runserver = ["migrate", "python manage.py tailwind runserver {args}"]
