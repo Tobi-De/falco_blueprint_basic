@@ -23,6 +23,7 @@ dependencies = [
   "django-storages[s3]",
   "django-compressor",
   "django-tailwind-cli",
+  "django-cotton",
   "django-template-partials",
   "django-lifecycle",
   "django-q2",
@@ -54,6 +55,7 @@ blank_line_before_tag = "block,partialdef"
 close_void_tags = true
 format_css = true
 format_js = true
+custom_html = "c-\\w+"
 # TODO: remove T002 when fixed https://github.com/Riverside-Healthcare/djLint/issues/687
 ignore = "H006,H030,H031,T002,H021"
 include = "H017,H035"
