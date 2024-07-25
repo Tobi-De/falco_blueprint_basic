@@ -42,6 +42,7 @@ dependencies = [
   "psycopg[binary,pool]",
   "sentry-sdk",
   "whitenoise",
+  "litestream-bin",
 ]
 
 [tool.django-stubs]
