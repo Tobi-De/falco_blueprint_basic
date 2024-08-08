@@ -60,6 +60,8 @@ DATABASES = {
 }
 if not DEBUG:
     if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+        # https://blog.pecar.me/sqlite-django-config
+        # https://blog.pecar.me/sqlite-prod
         DATABASES["default"]["OPTIONS"] =  {
             "transaction_mode": "IMMEDIATE",
             "init_command": """
@@ -71,9 +73,7 @@ if not DEBUG:
             """,
         }
     elif DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
-        DATABASES["default"]["OPTIONS"] = {
-            "pool": True
-        },
+        DATABASES["default"]["OPTIONS"] = {"pool": True}
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
