@@ -37,7 +37,7 @@ COPY . /app
 WORKDIR /app
 RUN python manage.py tailwind --skip-checks build \
  && python manage.py collectstatic --no-input --skip-checks --clear \
- && python manage.py compress --skip-checks
+ && python manage.py compress
 
 # Stage 3: Run service
 FROM python-base as production
