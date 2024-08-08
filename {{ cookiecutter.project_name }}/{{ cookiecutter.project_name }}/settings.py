@@ -74,6 +74,7 @@ if not DEBUG:
         }
     elif DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
         DATABASES["default"]["OPTIONS"] = {"pool": True}
+        DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
