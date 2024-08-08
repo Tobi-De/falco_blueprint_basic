@@ -50,6 +50,6 @@ COPY {{ cookiecutter.project_name }} /app/{{ cookiecutter.project_name }}
 COPY manage.py /app/manage.py
 RUN rm -r /app/{{ cookiecutter.project_name }}/static/
 
-EXPOSE 8000
+EXPOSE 80
 ENTRYPOINT ["/init"]
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl -f http://127.0.0.1:8000/health
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl -f http://127.0.0.1:80/health
