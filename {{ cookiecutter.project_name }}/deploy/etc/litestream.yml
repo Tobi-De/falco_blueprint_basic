@@ -1,0 +1,4 @@
+dbs:
+  - path: $DATABASE_PATH
+    replicas:
+      - url: $REPLICA_URL

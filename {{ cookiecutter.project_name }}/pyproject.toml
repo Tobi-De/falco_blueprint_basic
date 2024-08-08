@@ -17,7 +17,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-  "django[argon2]",
+  "django[argon2]>=5.1",
   "django-allauth",
   "django-anymail[amazon-ses]",
   "django-storages[s3]",
@@ -35,13 +35,14 @@ dependencies = [
   "diskcache",
   "environs[django]",
   "heroicons[django]",
-  "gunicorn",
+  "granian",
   "boto3",
   "crispy-tailwind",
   "Pillow",
-  "psycopg[binary]",
+  "psycopg[binary,pool]",
   "sentry-sdk",
   "whitenoise",
+  "litestream-bin",
 ]
 
 [tool.django-stubs]
