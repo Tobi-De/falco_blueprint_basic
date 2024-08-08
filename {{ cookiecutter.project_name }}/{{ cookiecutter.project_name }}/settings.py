@@ -93,10 +93,12 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "compressor",
     "crispy_forms",
     "crispy_tailwind",
+    "django_cotton",
+    "django_extensions",
     "django_htmx",
-    "template_partials",
     "django_tailwind_cli",
     "django_q",
     "django_q_registry",
@@ -106,8 +108,7 @@ THIRD_PARTY_APPS = [
     "health_check.storage",
     "health_check.contrib.migrations",
     "heroicons",
-    "compressor",
-    "django_extensions",
+    "template_partials.apps.SimpleAppConfig",
 ]
 
 LOCAL_APPS = [
@@ -119,10 +120,10 @@ if DEBUG:
     # Development only apps
     THIRD_PARTY_APPS = [
         "debug_toolbar",
-        "whitenoise.runserver_nostatic",
         "django_browser_reload",
         "django_fastdev",
         "django_watchfiles",
+        "whitenoise.runserver_nostatic",
         *THIRD_PARTY_APPS,
     ]
 
@@ -266,15 +267,17 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
             ],
             "builtins": [
-                "template_partials.templatetags.partials",
+                "django_cotton.templatetags.cotton",
                 "heroicons.templatetags.heroicons",
+                "template_partials.templatetags.partials",
             ],
             "debug": DEBUG,
             "loaders": [
+                "django_cotton.cotton_loader.Loader",
                 (
                     "template_partials.loader.Loader",
                     DEFAULT_LOADERS if DEBUG else CACHED_LOADERS,
-                )
+                ),
             ],
         },
     },

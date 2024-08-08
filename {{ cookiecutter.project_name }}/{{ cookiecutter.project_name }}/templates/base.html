@@ -21,6 +21,13 @@
     {% compress js %}
       {% block javascript %}
       {% endblock javascript %}
+      <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+      </script>
     {% endcompress js %}
   </head>
   <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
