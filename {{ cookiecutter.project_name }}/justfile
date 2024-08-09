@@ -91,8 +91,8 @@ coverage-report: test
     just cmd python -m manage {{ COMMAND }}
 
 # Run the django development server
-@server:
-    just falco work
+@server ADDRESS="":
+    just falco work {{ ADDRESS }}
 
 # Open a Django shell using django-extensions shell_plus command
 @shell:
