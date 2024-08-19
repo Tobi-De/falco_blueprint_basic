@@ -15,6 +15,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 ENV PATH="$VENV_PATH/bin:$PATH"
 
+RUN echo 'alias {{ cookiecutter.project_name }}="cd /app && python {{ cookiecutter.project_name }}/__main__.py"' >> /etc/bash.bashrc
+
 # Stage 2: Install dependencies & build static files
 FROM python-base as builder-base
 
