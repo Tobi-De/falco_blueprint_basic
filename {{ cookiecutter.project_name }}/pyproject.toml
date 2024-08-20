@@ -23,6 +23,7 @@ dependencies = [
   "django-storages[s3]",
   "django-compressor",
   "django-tailwind-cli",
+  "django-cotton",
   "django-template-partials",
   "django-lifecycle",
   "django-q2",
@@ -55,6 +56,7 @@ close_void_tags = true
 format_css = true
 format_js = true
 ignore = "H006,H030,H031,H021"
+custom_html = "c-\\w+"
 include = "H017,H035"
 indent = 2
 max_line_length = 120
