@@ -58,11 +58,24 @@ CSRF_COOKIE_SECURE = not DEBUG
 DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", default="sqlite:///db.sqlite3"),
 }
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
 if not DEBUG:
-    DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
-    DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+    if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+        # https://blog.pecar.me/sqlite-django-config
+        # https://blog.pecar.me/sqlite-prod
+        DATABASES["default"]["OPTIONS"] = {
+            "transaction_mode": "IMMEDIATE",
+            "init_command": """
+                PRAGMA journal_mode=WAL;
+                PRAGMA synchronous=NORMAL;
+                PRAGMA mmap_size = 134217728;
+                PRAGMA journal_size_limit = 27103364;
+                PRAGMA cache_size=2000;
+            """,
+        }
+    elif DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
+        DATABASES["default"]["OPTIONS"] = {"pool": True}
+        DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -98,6 +111,7 @@ THIRD_PARTY_APPS = [
     "crispy_tailwind",
     "django_extensions",
     "django_htmx",
+    "django_litestream",
     "django_q",
     "django_q_registry",
     "django_tailwind_cli",

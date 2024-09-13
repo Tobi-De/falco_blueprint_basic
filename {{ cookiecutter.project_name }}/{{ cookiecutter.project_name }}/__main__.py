@@ -1,7 +1,7 @@
 def main() -> None:
-    from pathlib import Path
     import os
     import sys
+    from pathlib import Path
 
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE", "{{ cookiecutter.project_name }}.settings"
@@ -16,7 +16,7 @@ def main() -> None:
     if run_func:
         run_func(sys.argv)
     else:
-        run_gunicorn(sys.argv)
+        run_granian(sys.argv)
 
 
 def run_setup(_):
@@ -25,6 +25,17 @@ def run_setup(_):
     from django.core.management.base import CommandError
     from contextlib import suppress
 
+    execute_from_command_line(["manage", "litestream", "init"])
+    execute_from_command_line(
+        [
+            "manage",
+            "litestream",
+            "restore",
+            "default",
+            "-if-replica-exists",
+            "-if-db-not-exists",
+        ]
+    )
     execute_from_command_line(["manage", "migrate"])
     execute_from_command_line(["manage", "setup_periodic_tasks"])
 
@@ -34,34 +45,30 @@ def run_setup(_):
         )
 
 
-def run_gunicorn(argv: list) -> None:
+def run_granian(argv: list) -> None:
     """
-    Run gunicorn the wsgi server.
-    https://docs.gunicorn.org/en/stable/settings.html
-    https://adamj.eu/tech/2021/12/29/set-up-a-gunicorn-configuration-file-and-test-it/
+    Run granian the WSGI server.
+    https://github.com/emmett-framework/granian
     """
     import multiprocessing
-    from gunicorn.app import wsgiapp
+    import granian
+    from granian.constants import Interfaces
 
     workers = multiprocessing.cpu_count() * 2 + 1
-    gunicorn_args = [
+    granian.Granian(
         "{{ cookiecutter.project_name }}.wsgi:application",
-        "--bind",
-        "0.0.0.0:8000",
-        # "unix:/run/{{ cookiecutter.project_name }}.gunicorn.sock", # uncomment this line and comment the line above to use a socket file
-        "--max-requests",
-        "1000",
-        "--max-requests-jitter",
-        "50",
-        "--workers",
-        str(workers),
-        "--access-logfile",
-        "-",
-        "--error-logfile",
-        "-",
-    ]
-    argv.extend(gunicorn_args)
-    wsgiapp.run()
+        interface=Interfaces.WSGI,
+        workers=workers,
+        address="127.0.0.1",
+        port=8000,
+    ).serve()
+
+
+def run_litestream(argv: list) -> None:
+    """Run Litestream via django-litestream."""
+    from django.core.management import execute_from_command_line
+
+    execute_from_command_line(["manage", "litestream", *argv[2:]])
 
 
 def run_qcluster(argv: list) -> None:
@@ -78,8 +85,12 @@ def run_manage(argv: list) -> None:
     execute_from_command_line(argv[1:])
 
 
-COMMANDS = {"qcluster": run_qcluster, "manage": run_manage, "setup": run_setup}
-
+COMMANDS = {
+    "qcluster": run_qcluster,
+    "manage": run_manage,
+    "setup": run_setup,
+    "litestream": run_litestream,
+}
 
 if __name__ == "__main__":
     main()

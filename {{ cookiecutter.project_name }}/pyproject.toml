@@ -17,13 +17,14 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-  "django[argon2]",
+  "django[argon2]>=5.1",
   "django-allauth[socialaccount]",
   "django-anymail[amazon-ses]",
   "django-storages[s3]",
   "django-compressor",
   "django-tailwind-cli",
   "django-template-partials",
+  "django-litestream",
   "django-lifecycle",
   "django-q2",
   "django-q-registry",
@@ -36,14 +37,15 @@ dependencies = [
   "diskcache",
   "environs[django]",
   "heroicons[django]",
-  "gunicorn",
+  "granian",
   "boto3",
   "crispy-tailwind",
   "Pillow",
-  "psycopg[binary]",
+  "psycopg[binary,pool]",
   "sentry-sdk",
   "whitenoise",
   "refreshcss",
+  "litestream-bin",
 ]
 
 scripts.{{ cookiecutter.project_name }} = "{{ cookiecutter.project_name }}.__main__:main"

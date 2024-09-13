@@ -1,4 +1,4 @@
 #!/command/with-contenv execlineb
 
 cd /app
-exec python {{ cookiecutter.project_name }}/__main__.py
+exec python {{ cookiecutter.project_name }}/__main__.py litestream replicate -exec "python {{ cookiecutter.project_name }}/__main__.py"
