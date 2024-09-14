@@ -35,33 +35,21 @@ def run_setup(_):
 
 
 def run_gunicorn(argv: list) -> None:
-    """
-    Run gunicorn the wsgi server.
-    https://docs.gunicorn.org/en/stable/settings.html
-    https://adamj.eu/tech/2021/12/29/set-up-a-gunicorn-configuration-file-and-test-it/
-    """
-    import multiprocessing
-    from gunicorn.app import wsgiapp
+    import sys
+    import subprocess
+    from pathlib import Path
 
-    workers = multiprocessing.cpu_count() * 2 + 1
-    gunicorn_args = [
-        "{{ cookiecutter.project_name }}.wsgi:application",
-        "--bind",
-        "0.0.0.0:8000",
-        # "unix:/run/{{ cookiecutter.project_name }}.gunicorn.sock", # uncomment this line and comment the line above to use a socket file
-        "--max-requests",
-        "1000",
-        "--max-requests-jitter",
-        "50",
-        "--workers",
-        str(workers),
-        "--access-logfile",
-        "-",
-        "--error-logfile",
-        "-",
-    ]
-    argv.extend(gunicorn_args)
-    wsgiapp.run()
+    bin_dir = Path(sys.executable).parent
+
+    argv = argv[1:]
+    argv.extend(
+        [
+            "-c",
+            "{{ cookiecutter.project_name }}/gunicorn.py",
+            "{{ cookiecutter.project_name }}.wsgi",
+        ]
+    )
+    subprocess.run([bin_dir / "gunicorn", *argv], check=False)
 
 
 def run_qcluster(argv: list) -> None:

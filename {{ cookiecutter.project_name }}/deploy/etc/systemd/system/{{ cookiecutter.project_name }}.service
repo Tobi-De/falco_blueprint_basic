@@ -1,0 +1,23 @@
+[Unit]
+Description={{ cookiecutter.project_name }} daemon
+Requires={{ cookiecutter.project_name }}.socket
+After=network.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+User={{ cookiecutter.username }}
+Group=www-data
+RuntimeDirectory={{ cookiecutter.project_name }}
+WorkingDirectory=/home/{{ cookiecutter.username }}/djangoprojects/{{ cookiecutter.project_name }}
+ExecStart=/home/{{ cookiecutter.username }}/djangoprojects/{{ cookiecutter.project_name }}/{{ cookiecutter.project_name }} --bind unix:/run/{{ cookiecutter.project_name }}.sock
+EnvironmentFile=/home/{{ cookiecutter.username }}/djangoprojects/{{ cookiecutter.project_name }}/.env
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+# if your app does not need administrative capabilities, let systemd know
+# ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target
