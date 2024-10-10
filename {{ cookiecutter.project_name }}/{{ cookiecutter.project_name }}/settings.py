@@ -9,11 +9,12 @@ import sentry_sdk
 from environs import Env
 from marshmallow.validate import Email
 from marshmallow.validate import OneOf
+from pygments.lexer import default
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-from falco_toolbox.sentry import sentry_profiles_sampler
-from falco_toolbox.sentry import sentry_traces_sampler
+from falco.sentry import sentry_profiles_sampler
+from falco.sentry import sentry_traces_sampler
 
 # 0. Setup
 # --------------------------------------------------------------------------------------------
@@ -30,6 +31,8 @@ env.read_env(Path(BASE_DIR, ".env").as_posix())
 # False when deployed, whether or not it's a production environment.
 DEBUG = env.bool("DEBUG", default=False)
 
+PROD = not DEBUG
+
 # 1. Django Core Settings
 # -----------------------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/4.0/ref/settings/
@@ -40,29 +43,44 @@ ALLOWED_HOSTS = env.list(
 
 ASGI_APPLICATION = "{{ cookiecutter.project_name }}.asgi.application"
 
-# https://grantjenks.com/docs/diskcache/tutorial.html#djangocache
-if "CACHE_LOCATION" in os.environ:
-    CACHES = {
-        "default": {
-            "BACKEND": "diskcache.DjangoCache",
-            "LOCATION": env.str("CACHE_LOCATION"),
-            "TIMEOUT": 300,
-            "SHARDS": 8,
-            "DATABASE_TIMEOUT": 0.010,  # 10 milliseconds
-            "OPTIONS": {"size_limit": 2**30},  # 1 gigabyte
-        }
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    }
+}
+if PROD:
+    # https://grantjenks.com/docs/diskcache/tutorial.html#djangocache
+    CACHES["default"] = {
+        "BACKEND": "diskcache.DjangoCache",
+        "LOCATION": env.str("CACHE_LOCATION", default=".diskcache"),
+        "TIMEOUT": 300,
+        "SHARDS": 8,
+        "DATABASE_TIMEOUT": 0.010,  # 10 milliseconds
+        "OPTIONS": {"size_limit": 2 ** 30},  # 1 gigabyte
     }
 
-CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = PROD
 
 DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", default="sqlite:///db.sqlite3"),
 }
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
-if not DEBUG:
-    DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
-    DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+if PROD:
+    if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+        # https://blog.pecar.me/sqlite-django-config
+        # https://blog.pecar.me/sqlite-prod
+        DATABASES["default"]["OPTIONS"] = {
+            "transaction_mode": "IMMEDIATE",
+            "init_command": """
+                PRAGMA journal_mode=WAL;
+                PRAGMA synchronous=NORMAL;
+                PRAGMA mmap_size = 134217728;
+                PRAGMA journal_size_limit = 27103364;
+                PRAGMA cache_size=2000;
+            """,
+        }
+    elif DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
+        DATABASES["default"]["OPTIONS"] = {"pool": True}
+        DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -90,19 +108,19 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "falco_ui",  # first to overwrite allauth templates
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "compressor",
     "crispy_forms",
     "crispy_tailwind",
     "django_extensions",
     "django_htmx",
+    "django_litestream",
     "django_q",
     "django_q_registry",
     "django_tailwind_cli",
-    "falco_ui.favicons",
-    "falco_toolbox",
+    "falco",
     "health_check",
     "health_check.cache",
     "health_check.contrib.migrations",
@@ -207,9 +225,9 @@ ROOT_URLCONF = "{{ cookiecutter.project_name }}.urls"
 
 SECRET_KEY = env.str("SECRET_KEY", default="{{ cookiecutter.secret_key }}")
 
-SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_INCLUDE_SUBDOMAINS = PROD
 
-SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_HSTS_PRELOAD = PROD
 
 # https://docs.djangoproject.com/en/dev/ref/middleware/#http-strict-transport-security
 # 2 minutes to start with, will increase as HSTS is tested
@@ -219,7 +237,7 @@ SECURE_HSTS_SECONDS = 0 if DEBUG else env.int("SECURE_HSTS_SECONDS", default=60 
 # https://noumenal.es/notes/til/django/csrf-trusted-origins/
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = PROD
 
 SERVER_EMAIL = env.str(
     "SERVER_EMAIL",
@@ -227,7 +245,7 @@ SERVER_EMAIL = env.str(
     validate=lambda v: Email()(parseaddr(v)[1]),
 )
 
-SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = PROD
 
 STORAGES = {
     "default": {
@@ -326,7 +344,6 @@ STATICFILES_DIRS = [APPS_DIR / "static"]
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
 )
 
 # 3. Third Party Settings
@@ -352,7 +369,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 LOGIN_REDIRECT_URL = "home"
 
 # django-anymail
-if not DEBUG:
+if PROD:
     ANYMAIL = {
         "AMAZON_SES_CLIENT_PARAMS": {
             "aws_access_key_id": env.str("AWS_ACCESS_KEY_ID", default=None),
@@ -360,17 +377,6 @@ if not DEBUG:
             "region_name": env.str("AWS_S3_REGION_NAME", default=None),
         }
     }
-
-# django-compressor
-COMPRESS_OFFLINE = not DEBUG
-COMPRESS_FILTERS = {
-    "css": [
-        "compressor.filters.css_default.CssAbsoluteFilter",
-        "compressor.filters.cssmin.rCSSMinFilter",
-        "refreshcss.filters.RefreshCSSFilter",
-    ],
-    "js": ["compressor.filters.jsmin.rJSMinFilter"],
-}
 
 # django-crispy-forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
@@ -398,7 +404,7 @@ Q_CLUSTER = {
 }
 
 # sentry
-if (SENTRY_DSN := env.url("SENTRY_DSN", default=None)).scheme and not DEBUG:
+if (SENTRY_DSN := env.url("SENTRY_DSN", default=None)).scheme and PROD:
     sentry_sdk.init(
         dsn=SENTRY_DSN.geturl(),
         environment=env.str(
@@ -414,6 +420,11 @@ if (SENTRY_DSN := env.url("SENTRY_DSN", default=None)).scheme and not DEBUG:
         profiles_sampler=sentry_profiles_sampler,
         send_default_pii=True,
     )
+
+# django-tailwind-cli using DaisyUI
+TAILWIND_CLI_SRC_REPO = "dobicinaitis/tailwind-cli-extra"
+TAILWIND_CLI_ASSET_NAME = "tailwindcss-extra"
+TAILWIND_CLI_VERSION = "1.7.17"
 
 # 4. Project Settings
 # -----------------------------------------------------------------------------------------------------

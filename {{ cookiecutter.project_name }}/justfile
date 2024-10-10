@@ -24,6 +24,7 @@ setup:
     just migrate
     just createsuperuser
     just lint > /dev/null 2>&1 || true
+    echo "DEBUG=True" >> .env
 
 # Install dependencies
 @install:
@@ -80,17 +81,13 @@ coverage-report: test
 # DJANGO
 # ----------------------------------------------------------------------
 
-# Run a falco command
-@falco *COMMAND:
-    just run falco {{ COMMAND }}
-
 # Run a django management command
 @dj *COMMAND:
-    just run python -m manage {{ COMMAND }}
+    just run {% endraw %}{{ cookiecutter.project_name }}{% raw %} manage {{ COMMAND }}
 
 # Run the django development server
 @server ADDRESS="":
-    just falco work {{ ADDRESS }}
+    just dj work {{ ADDRESS }}
 
 # Kill the django development server in case the process is running in the background
 @kill-server PORT="8000":
@@ -133,7 +130,6 @@ createsuperuser EMAIL="admin@localhost" PASSWORD="admin":
 @collectstatic:
     just dj tailwind --skip-checks build
     just dj collectstatic --no-input --skip-checks
-    just dj compress
 
 # ----------------------------------------------------------------------
 # DOCS

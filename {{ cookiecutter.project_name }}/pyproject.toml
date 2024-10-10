@@ -17,13 +17,13 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-  "django[argon2]",
+  "django[argon2]>=5.1",
   "django-allauth[socialaccount]",
   "django-anymail[amazon-ses]",
   "django-storages[s3]",
-  "django-compressor",
   "django-tailwind-cli",
   "django-template-partials",
+  "django-litestream",
   "django-lifecycle",
   "django-q2",
   "django-q-registry",
@@ -31,18 +31,18 @@ dependencies = [
   "django-unique-user-email",
   "django-extensions",
   "django-htmx",
-  "falco-toolbox",
-  "falco-ui",
   "diskcache",
   "environs[django]",
+  "falco-app",
+  "falco-ui",
   "heroicons[django]",
-  "gunicorn",
+  "granian",
   "boto3",
   "crispy-tailwind",
   "Pillow",
-  "psycopg[binary]",
+  "psycopg[binary,pool]",
   "sentry-sdk",
-  "whitenoise",
+  "whitenoise[brotli]",
   "refreshcss",
 ]
 
@@ -62,14 +62,6 @@ tests = ["tests", "*/{{ cookiecutter.project_name }}/tests"]
 
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
-
-[tool.falco]
-htmx = "{{ cookiecutter.project_name }}/static/vendors/htmx/htmx.min.js:2.0.2"
-
-[tool.falco.work]
-server = "python manage.py migrate && python manage.py runserver {address}"
-tailwind = "python manage.py tailwind watch"
-worker = "python manage.py qcluster"
 
 [tool.hatch.env]
 requires = [
@@ -107,17 +99,17 @@ dependencies = [
     "Werkzeug[watchdog]>=3.0.1",
     "django-stubs[compatible-mypy]",
     "django-fastdev",
+    "django-watchfiles",
     "coverage[toml]>=6.5",
     "pre-commit",
     "pytest",
     "pytest-django",
     "pytest-sugar",
     "pytest-xdist",
-    "falco-cli",
-    "django-watchfiles",
     "git-cliff",
     "bump-my-version",
     "hatch-pip-compile",
+    "falco-cli",
 ]
 lock-filename = "requirements-dev.txt"
 

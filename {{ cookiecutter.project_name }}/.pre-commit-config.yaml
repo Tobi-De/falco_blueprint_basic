@@ -28,13 +28,13 @@ repos:
     rev: "1.2.0"
     hooks:
     -   id: djade
-        args: [--target-version, "5.0"]
+        args: [--target-version, "5.1"]
 
   - repo: https://github.com/adamchainz/django-upgrade
     rev: "1.21.0"
     hooks:
     -   id: django-upgrade
-        args: [--target-version, "5.0"]
+        args: [--target-version, "5.1"]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: "2.2.4"

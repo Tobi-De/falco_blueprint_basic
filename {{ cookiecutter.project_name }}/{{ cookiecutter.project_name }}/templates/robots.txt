@@ -1,2 +1,3 @@
+# Allow all crawlers by default, if you are building an internal change to Disallow: /
 User-Agent: *
-Disallow: /
+Disallow:

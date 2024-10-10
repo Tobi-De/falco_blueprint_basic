@@ -1,4 +1,0 @@
-#!/command/with-contenv execlineb
-
-cd /app
-exec python {{ cookiecutter.project_name }}/__main__.py qcluster
